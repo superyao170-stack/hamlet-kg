@@ -1,0 +1,57 @@
+{
+  "case_id": "CASE-B",
+  "entities": [
+    {"entity_id": "B-S1", "entity_type": "ACCOUNT"},
+    {"entity_id": "B-S2", "entity_type": "ACCOUNT"},
+    {"entity_id": "B-S3", "entity_type": "ACCOUNT"},
+    {"entity_id": "B-S4", "entity_type": "ACCOUNT"},
+    {"entity_id": "B-HUB", "entity_type": "ACCOUNT"},
+    {"entity_id": "B-CASH", "entity_type": "ACCOUNT"}
+  ],
+  "atomic_events": [
+    {
+      "event_id": "B-T1",
+      "action_type": "TRANSFER",
+      "roles": {"sender": "B-S1", "receiver": "B-HUB"},
+      "timestamp": "2026-02-03T08:20:00Z",
+      "attributes": {"amount": 21000, "channel": "MOBILE"}
+    },
+    {
+      "event_id": "B-T2",
+      "action_type": "TRANSFER",
+      "roles": {"sender": "B-S2", "receiver": "B-HUB"},
+      "timestamp": "2026-02-03T08:55:00Z",
+      "attributes": {"amount": 20000, "channel": "MOBILE"}
+    },
+    {
+      "event_id": "B-T3",
+      "action_type": "TRANSFER",
+      "roles": {"sender": "B-S3", "receiver": "B-HUB"},
+      "timestamp": "2026-02-03T09:40:00Z",
+      "attributes": {"amount": 22000, "channel": "WEB"}
+    },
+    {
+      "event_id": "B-T4",
+      "action_type": "TRANSFER",
+      "roles": {"sender": "B-S4", "receiver": "B-HUB"},
+      "timestamp": "2026-02-03T10:05:00Z",
+      "attributes": {"amount": 19000, "channel": "WEB"}
+    },
+    {
+      "event_id": "B-T5",
+      "action_type": "TRANSFER",
+      "roles": {"sender": "B-HUB", "receiver": "B-CASH"},
+      "timestamp": "2026-02-03T12:30:00Z",
+      "attributes": {"amount": 79000, "channel": "MOBILE"}
+    },
+    {
+      "event_id": "B-W1",
+      "action_type": "CASH_WITHDRAWAL",
+      "roles": {"account": "B-CASH"},
+      "timestamp": "2026-02-03T18:10:00Z",
+      "attributes": {"amount": 72000, "channel": "ATM"}
+    }
+  ],
+  "metadata": {"scenario": "synthetic-fan-in-cash-out"}
+}
+

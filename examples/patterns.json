@@ -1,0 +1,129 @@
+{
+  "patterns": [
+    {
+      "pattern_id": "P-FAST-PASS-THROUGH",
+      "risk_type": "FAST_PASS_THROUGH",
+      "description": "资金转入后在短时间内大比例转出",
+      "version": "1.0",
+      "clauses": [
+        {
+          "clause_id": "incoming",
+          "action_type": "TRANSFER",
+          "anchor_role": "receiver",
+          "min_count": 1
+        },
+        {
+          "clause_id": "outgoing",
+          "action_type": "TRANSFER",
+          "anchor_role": "sender",
+          "min_count": 1
+        }
+      ],
+      "constraints": [
+        {
+          "constraint_type": "ordered_within",
+          "parameters": {
+            "earlier": "incoming",
+            "later": "outgoing",
+            "min_seconds": 1,
+            "max_seconds": 86400
+          }
+        },
+        {
+          "constraint_type": "sum_ratio",
+          "parameters": {
+            "numerator": "outgoing",
+            "denominator": "incoming",
+            "attribute": "amount",
+            "minimum": 0.8,
+            "maximum": 1.2
+          }
+        }
+      ]
+    },
+    {
+      "pattern_id": "P-FAN-IN-OUT",
+      "risk_type": "FAN_IN_THEN_OUT",
+      "description": "来自多个不同账户的资金汇集后集中转出",
+      "version": "1.0",
+      "clauses": [
+        {
+          "clause_id": "incoming",
+          "action_type": "TRANSFER",
+          "anchor_role": "receiver",
+          "min_count": 3,
+          "distinct_role": "sender"
+        },
+        {
+          "clause_id": "outgoing",
+          "action_type": "TRANSFER",
+          "anchor_role": "sender",
+          "min_count": 1
+        }
+      ],
+      "constraints": [
+        {
+          "constraint_type": "ordered_within",
+          "parameters": {
+            "earlier": "incoming",
+            "later": "outgoing",
+            "min_seconds": 1,
+            "max_seconds": 86400
+          }
+        },
+        {
+          "constraint_type": "sum_ratio",
+          "parameters": {
+            "numerator": "outgoing",
+            "denominator": "incoming",
+            "attribute": "amount",
+            "minimum": 0.8,
+            "maximum": 1.2
+          }
+        }
+      ]
+    },
+    {
+      "pattern_id": "P-RAPID-CASH-OUT",
+      "risk_type": "RAPID_CASH_OUT",
+      "description": "账户收到转账后短时间内取现",
+      "version": "1.0",
+      "clauses": [
+        {
+          "clause_id": "funding",
+          "action_type": "TRANSFER",
+          "anchor_role": "receiver",
+          "min_count": 1
+        },
+        {
+          "clause_id": "cashout",
+          "action_type": "CASH_WITHDRAWAL",
+          "anchor_role": "account",
+          "min_count": 1
+        }
+      ],
+      "constraints": [
+        {
+          "constraint_type": "ordered_within",
+          "parameters": {
+            "earlier": "funding",
+            "later": "cashout",
+            "min_seconds": 1,
+            "max_seconds": 86400
+          }
+        },
+        {
+          "constraint_type": "sum_ratio",
+          "parameters": {
+            "numerator": "cashout",
+            "denominator": "funding",
+            "attribute": "amount",
+            "minimum": 0.5,
+            "maximum": 1.2
+          }
+        }
+      ]
+    }
+  ]
+}
+

@@ -1,0 +1,13 @@
+# Reproducible experiment and notebook dependencies.
+# Install into the project virtual environment; the core package remains
+# standard-library only.
+matplotlib==3.11.1
+nbclient==0.11.0
+nbformat==5.11.1
+ipykernel==7.3.0
+networkx==3.6.1
+numpy==2.3.5
+pandas==2.2.3
+POT==0.9.7.post1
+scikit-learn==1.9.0
+scipy==1.18.1

@@ -1,0 +1,5 @@
+{
+  "CASE-A": ["CASE-B"],
+  "CASE-B": ["CASE-A"]
+}
+

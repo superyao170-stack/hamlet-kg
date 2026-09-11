@@ -1,0 +1,432 @@
+{
+  "catalog_id": "HAMLET-AML-RISK-PATTERNS-V1",
+  "catalog_version": "1.0.0",
+  "created_at": "2026-09-11",
+  "language": "zh-CN",
+  "decision_semantics": "candidate_risk_event_not_money_laundering_conclusion",
+  "threshold_policy": "All numeric values are research defaults and require validation-set calibration. They are not regulatory thresholds unless a jurisdiction profile explicitly says so.",
+  "sources": [
+    {
+      "source_id": "FINCEN-2014-A005",
+      "title": "Update on U.S. Currency Restrictions in Mexico: Funnel Accounts and TBML",
+      "publisher": "FinCEN",
+      "url": "https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2014-a005"
+    },
+    {
+      "source_id": "FINCEN-2014-A008",
+      "title": "Guidance on Recognizing Activity that May be Associated with Human Smuggling and Human Trafficking",
+      "publisher": "FinCEN",
+      "url": "https://www.fincen.gov/resources/advisories/fincen-advisory-fin-2014-a008"
+    },
+    {
+      "source_id": "AUSTRAC-BANKING-INDICATORS",
+      "title": "Indicators of suspicious activity for the banking sector",
+      "publisher": "AUSTRAC",
+      "url": "https://www.austrac.gov.au/industry-and-business/education-and-resources/publications-and-resources/indicators-suspicious-activity-banking-sector"
+    },
+    {
+      "source_id": "FATF-EGMONT-TBML-2021",
+      "title": "Trade-Based Money Laundering: Risk Indicators",
+      "publisher": "FATF and Egmont Group",
+      "url": "https://www.fatf-gafi.org/content/dam/fatf-gafi/reports/Trade-Based-Money-Laundering-Risk-Indicators.pdf"
+    },
+    {
+      "source_id": "GFP-2024",
+      "title": "Graph Feature Preprocessor: Real-time Subgraph-based Feature Extraction for Financial Crime Detection",
+      "publisher": "arXiv / OpenReview",
+      "url": "https://arxiv.org/abs/2402.08593"
+    },
+    {
+      "source_id": "IBM-AML-2023",
+      "title": "Realistic Synthetic Financial Transactions for Anti-Money Laundering Models",
+      "publisher": "NeurIPS 2023",
+      "url": "https://research.ibm.com/publications/realistic-synthetic-financial-transactions-for-anti-money-laundering-models"
+    }
+  ],
+  "patterns": [
+    {
+      "pattern_id": "AML-V1-01-RAPID-PASS-THROUGH",
+      "risk_type": "RAPID_PASS_THROUGH",
+      "description": "账户收款后在较短时间内转出与入账金额大体相当的资金，形成低留存的过渡账户行为。",
+      "version": "1.0",
+      "clauses": [
+        {
+          "clause_id": "incoming",
+          "action_type": "TRANSFER",
+          "anchor_role": "receiver",
+          "min_count": 1
+        },
+        {
+          "clause_id": "outgoing",
+          "action_type": "TRANSFER",
+          "anchor_role": "sender",
+          "min_count": 1
+        }
+      ],
+      "constraints": [
+        {
+          "constraint_type": "ordered_within",
+          "parameters": {
+            "earlier": "incoming",
+            "later": "outgoing",
+            "min_seconds": 1,
+            "max_seconds": 86400
+          }
+        },
+        {
+          "constraint_type": "sum_ratio",
+          "parameters": {
+            "numerator": "outgoing",
+            "denominator": "incoming",
+            "attribute": "amount",
+            "minimum": 0.8,
+            "maximum": 1.2
+          }
+        }
+      ],
+      "quality": {
+        "source": "expert_literature_synthesis",
+        "confidence_status": "uncalibrated"
+      },
+      "provenance": {
+        "source_ids": ["AUSTRAC-BANKING-INDICATORS", "FATF-EGMONT-TBML-2021"],
+        "source_indicator": "rapid movement through accounts and pass-through activity with a small residual balance",
+        "research_defaults": {
+          "window_seconds": 86400,
+          "outgoing_incoming_ratio": [0.8, 1.2]
+        },
+        "required_fields": ["timestamp", "sender", "receiver", "amount"],
+        "false_positive_notes": "工资代发、内部归集、证券结算和商户清算可能产生相似结构。"
+      }
+    },
+    {
+      "pattern_id": "AML-V1-02-MULTI-SOURCE-CONCENTRATION",
+      "risk_type": "MULTI_SOURCE_CONCENTRATION",
+      "description": "同一账户在短时间内接收多个不同交易对手的转账，形成多人向单一账户归集。",
+      "version": "1.0",
+      "clauses": [
+        {
+          "clause_id": "incoming",
+          "action_type": "TRANSFER",
+          "anchor_role": "receiver",
+          "min_count": 3,
+          "distinct_role": "sender"
+        }
+      ],
+      "constraints": [
+        {
+          "constraint_type": "duration_max",
+          "parameters": {
+            "max_seconds": 86400
+          }
+        }
+      ],
+      "quality": {
+        "source": "expert_literature_synthesis",
+        "confidence_status": "uncalibrated"
+      },
+      "provenance": {
+        "source_ids": ["FINCEN-2014-A008", "AUSTRAC-BANKING-INDICATORS"],
+        "source_indicator": "multiple unrelated or third-party originators send funds to one beneficiary",
+        "research_defaults": {
+          "window_seconds": 86400,
+          "minimum_distinct_senders": 3
+        },
+        "required_fields": ["timestamp", "sender", "receiver"],
+        "false_positive_notes": "众筹、平台收款、班费、团购和小微商户收单可能产生相似结构。"
+      }
+    },
+    {
+      "pattern_id": "AML-V1-03-GATHER-THEN-TRANSFER",
+      "risk_type": "GATHER_THEN_TRANSFER",
+      "description": "账户从多个不同来源归集资金后，在较短时间内集中向外转出。",
+      "version": "1.0",
+      "clauses": [
+        {
+          "clause_id": "incoming",
+          "action_type": "TRANSFER",
+          "anchor_role": "receiver",
+          "min_count": 3,
+          "distinct_role": "sender"
+        },
+        {
+          "clause_id": "outgoing",
+          "action_type": "TRANSFER",
+          "anchor_role": "sender",
+          "min_count": 1
+        }
+      ],
+      "constraints": [
+        {
+          "constraint_type": "ordered_within",
+          "parameters": {
+            "earlier": "incoming",
+            "later": "outgoing",
+            "min_seconds": 1,
+            "max_seconds": 86400
+          }
+        },
+        {
+          "constraint_type": "sum_ratio",
+          "parameters": {
+            "numerator": "outgoing",
+            "denominator": "incoming",
+            "attribute": "amount",
+            "minimum": 0.8,
+            "maximum": 1.2
+          }
+        }
+      ],
+      "quality": {
+        "source": "expert_literature_synthesis",
+        "confidence_status": "uncalibrated"
+      },
+      "provenance": {
+        "source_ids": ["FINCEN-2014-A005", "AUSTRAC-BANKING-INDICATORS", "GFP-2024", "IBM-AML-2023"],
+        "source_indicator": "funds from multiple sources are gathered and rapidly moved onward",
+        "research_defaults": {
+          "window_seconds": 86400,
+          "minimum_distinct_senders": 3,
+          "outgoing_incoming_ratio": [0.8, 1.2]
+        },
+        "required_fields": ["timestamp", "sender", "receiver", "amount"],
+        "false_positive_notes": "平台归集、资金池、总分账户和批量清算需要通过客户与账户属性排除。"
+      }
+    },
+    {
+      "pattern_id": "AML-V1-04-GATHER-THEN-CASH-OUT",
+      "risk_type": "GATHER_THEN_CASH_OUT",
+      "description": "账户收到多个不同来源的资金后，在较短时间内通过现金支取转移较大比例资金。",
+      "version": "1.0",
+      "clauses": [
+        {
+          "clause_id": "incoming",
+          "action_type": "TRANSFER",
+          "anchor_role": "receiver",
+          "min_count": 3,
+          "distinct_role": "sender"
+        },
+        {
+          "clause_id": "cashout",
+          "action_type": "CASH_WITHDRAWAL",
+          "anchor_role": "account",
+          "min_count": 1
+        }
+      ],
+      "constraints": [
+        {
+          "constraint_type": "ordered_within",
+          "parameters": {
+            "earlier": "incoming",
+            "later": "cashout",
+            "min_seconds": 1,
+            "max_seconds": 86400
+          }
+        },
+        {
+          "constraint_type": "sum_ratio",
+          "parameters": {
+            "numerator": "cashout",
+            "denominator": "incoming",
+            "attribute": "amount",
+            "minimum": 0.5,
+            "maximum": 1.2
+          }
+        }
+      ],
+      "quality": {
+        "source": "expert_literature_synthesis",
+        "confidence_status": "uncalibrated"
+      },
+      "provenance": {
+        "source_ids": ["FINCEN-2014-A005", "FINCEN-2014-A008", "AUSTRAC-BANKING-INDICATORS"],
+        "source_indicator": "multiple deposits or transfers are followed by rapid cash withdrawal",
+        "research_defaults": {
+          "window_seconds": 86400,
+          "minimum_distinct_senders": 3,
+          "cashout_incoming_ratio": [0.5, 1.2]
+        },
+        "required_fields": ["timestamp", "sender", "receiver", "amount", "cash_withdrawal_account"],
+        "false_positive_notes": "劳务结算、现金密集型商户和节假日前集中取现需要客户画像辅助判断。"
+      }
+    },
+    {
+      "pattern_id": "AML-V1-05-FUNDING-THEN-SCATTER",
+      "risk_type": "FUNDING_THEN_SCATTER",
+      "description": "账户收到资金后，在较短时间内向多个不同收款方分散转出。",
+      "version": "1.0",
+      "clauses": [
+        {
+          "clause_id": "incoming",
+          "action_type": "TRANSFER",
+          "anchor_role": "receiver",
+          "min_count": 1
+        },
+        {
+          "clause_id": "outgoing",
+          "action_type": "TRANSFER",
+          "anchor_role": "sender",
+          "min_count": 3,
+          "distinct_role": "receiver"
+        }
+      ],
+      "constraints": [
+        {
+          "constraint_type": "ordered_within",
+          "parameters": {
+            "earlier": "incoming",
+            "later": "outgoing",
+            "min_seconds": 1,
+            "max_seconds": 86400
+          }
+        },
+        {
+          "constraint_type": "sum_ratio",
+          "parameters": {
+            "numerator": "outgoing",
+            "denominator": "incoming",
+            "attribute": "amount",
+            "minimum": 0.8,
+            "maximum": 1.2
+          }
+        }
+      ],
+      "quality": {
+        "source": "expert_literature_synthesis",
+        "confidence_status": "uncalibrated"
+      },
+      "provenance": {
+        "source_ids": ["AUSTRAC-BANKING-INDICATORS", "FATF-EGMONT-TBML-2021", "GFP-2024", "IBM-AML-2023"],
+        "source_indicator": "incoming funds are rapidly split and forwarded to multiple unrelated accounts",
+        "research_defaults": {
+          "window_seconds": 86400,
+          "minimum_distinct_receivers": 3,
+          "outgoing_incoming_ratio": [0.8, 1.2]
+        },
+        "required_fields": ["timestamp", "sender", "receiver", "amount"],
+        "false_positive_notes": "工资、佣金、保险理赔和供应链批量付款可能产生相似结构。"
+      }
+    },
+    {
+      "pattern_id": "AML-V1-06-STRUCTURED-CASH-DEPOSITS",
+      "risk_type": "STRUCTURED_CASH_DEPOSITS",
+      "description": "同一账户在短窗口内发生多笔低于单笔阈值、但合计达到聚合阈值的现金存入。",
+      "version": "1.0",
+      "clauses": [
+        {
+          "clause_id": "cash_deposits",
+          "action_type": "CASH_DEPOSIT",
+          "anchor_role": "account",
+          "min_count": 3
+        }
+      ],
+      "constraints": [
+        {
+          "constraint_type": "attribute_range",
+          "parameters": {
+            "clause": "cash_deposits",
+            "attribute": "amount",
+            "minimum": 0.01,
+            "maximum": 9999.99
+          }
+        },
+        {
+          "constraint_type": "total_amount",
+          "parameters": {
+            "clause": "cash_deposits",
+            "attribute": "amount",
+            "minimum": 10000.0
+          }
+        },
+        {
+          "constraint_type": "duration_max",
+          "parameters": {
+            "max_seconds": 86400
+          }
+        }
+      ],
+      "quality": {
+        "source": "expert_literature_synthesis",
+        "confidence_status": "uncalibrated"
+      },
+      "provenance": {
+        "source_ids": ["FINCEN-2014-A005", "AUSTRAC-BANKING-INDICATORS", "FATF-EGMONT-TBML-2021"],
+        "source_indicator": "cash transactions are repeatedly structured below a relevant reporting threshold",
+        "threshold_profile": "illustrative_usd_research_profile_only",
+        "research_defaults": {
+          "window_seconds": 86400,
+          "minimum_count": 3,
+          "single_amount_maximum": 9999.99,
+          "aggregate_amount_minimum": 10000.0
+        },
+        "required_fields": ["timestamp", "cash_deposit_account", "amount", "currency"],
+        "false_positive_notes": "阈值必须按司法辖区、币种、监管口径和业务日定义替换；当前数值只用于美元演示。"
+      }
+    },
+    {
+      "pattern_id": "AML-V1-07-U-TURN",
+      "risk_type": "U_TURN_FUNDS_FLOW",
+      "description": "资金由交易对手转入锚点账户后，又在短时间内由锚点账户转回同一交易对手。",
+      "version": "1.0",
+      "clauses": [
+        {
+          "clause_id": "incoming",
+          "action_type": "TRANSFER",
+          "anchor_role": "receiver",
+          "min_count": 1
+        },
+        {
+          "clause_id": "returning",
+          "action_type": "TRANSFER",
+          "anchor_role": "sender",
+          "min_count": 1
+        }
+      ],
+      "constraints": [
+        {
+          "constraint_type": "ordered_within",
+          "parameters": {
+            "earlier": "incoming",
+            "later": "returning",
+            "min_seconds": 1,
+            "max_seconds": 259200
+          }
+        },
+        {
+          "constraint_type": "role_overlap",
+          "parameters": {
+            "left_clause": "incoming",
+            "left_role": "sender",
+            "right_clause": "returning",
+            "right_role": "receiver",
+            "minimum": 1
+          }
+        },
+        {
+          "constraint_type": "sum_ratio",
+          "parameters": {
+            "numerator": "returning",
+            "denominator": "incoming",
+            "attribute": "amount",
+            "minimum": 0.8,
+            "maximum": 1.2
+          }
+        }
+      ],
+      "quality": {
+        "source": "expert_literature_synthesis",
+        "confidence_status": "uncalibrated"
+      },
+      "provenance": {
+        "source_ids": ["AUSTRAC-BANKING-INDICATORS", "FATF-EGMONT-TBML-2021"],
+        "source_indicator": "funds return to an origin after one or more routing steps; this executable V1 detects the two-edge U-turn special case",
+        "research_defaults": {
+          "window_seconds": 259200,
+          "return_incoming_ratio": [0.8, 1.2]
+        },
+        "required_fields": ["timestamp", "sender", "receiver", "amount"],
+        "false_positive_notes": "退款、撤销、借款归还和账户间调拨可能产生相似结构。"
+      }
+    }
+  ]
+}

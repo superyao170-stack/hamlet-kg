@@ -1,0 +1,34 @@
+{
+  "case_id": "CASE-C",
+  "entities": [
+    {"entity_id": "C-COMPANY", "entity_type": "ORGANIZATION"},
+    {"entity_id": "C-E1", "entity_type": "ACCOUNT"},
+    {"entity_id": "C-E2", "entity_type": "ACCOUNT"},
+    {"entity_id": "C-E3", "entity_type": "ACCOUNT"}
+  ],
+  "atomic_events": [
+    {
+      "event_id": "C-T1",
+      "action_type": "TRANSFER",
+      "roles": {"sender": "C-COMPANY", "receiver": "C-E1"},
+      "timestamp": "2026-03-01T09:00:00Z",
+      "attributes": {"amount": 8500, "channel": "BATCH"}
+    },
+    {
+      "event_id": "C-T2",
+      "action_type": "TRANSFER",
+      "roles": {"sender": "C-COMPANY", "receiver": "C-E2"},
+      "timestamp": "2026-03-01T09:01:00Z",
+      "attributes": {"amount": 9100, "channel": "BATCH"}
+    },
+    {
+      "event_id": "C-T3",
+      "action_type": "TRANSFER",
+      "roles": {"sender": "C-COMPANY", "receiver": "C-E3"},
+      "timestamp": "2026-03-01T09:02:00Z",
+      "attributes": {"amount": 8700, "channel": "BATCH"}
+    }
+  ],
+  "metadata": {"scenario": "normal-payroll"}
+}
+

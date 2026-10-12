@@ -1,0 +1,12 @@
+{
+  "policy_id": "REFERENCE-CAUSAL-AML-V1",
+  "version": "1.0",
+  "rules": [
+    {"rule_id": "REF-FAN-IN", "operator": "fan_in", "window_seconds": 86400, "min_counterparties": 3},
+    {"rule_id": "REF-FAN-OUT", "operator": "fan_out", "window_seconds": 86400, "min_counterparties": 3},
+    {"rule_id": "REF-PASS-THROUGH", "operator": "pass_through", "window_seconds": 86400,
+     "min_incoming": 1, "ratio_min": 0.8, "ratio_max": 1.2},
+    {"rule_id": "REF-RELAY", "operator": "relay", "window_seconds": 86400,
+     "ratio_min": 0.8, "ratio_max": 1.2}
+  ]
+}

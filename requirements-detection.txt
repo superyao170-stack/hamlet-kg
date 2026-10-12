@@ -1,0 +1,4 @@
+# Optional dependencies for transaction detection. Exact installed versions,
+# seeds and hyperparameters are recorded in each run's manifest.json.
+torch>=2.2,<3
+numpy>=1.26,<3

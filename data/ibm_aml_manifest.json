@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "dataset_ref": "ealtman2019/ibm-transactions-for-anti-money-laundering-aml",
+  "dataset_url": "https://www.kaggle.com/datasets/ealtman2019/ibm-transactions-for-anti-money-laundering-aml/versions/8",
+  "retrieved_at_utc": "2026-10-08T16:19:38.030266+00:00",
+  "upstream_declarations": {
+    "dataset_id": 2948142,
+    "dataset_version_number": 8,
+    "dataset_last_updated_utc": "2025-07-08T14:59:13.28Z",
+    "is_private": false,
+    "license_name": "Community Data License Agreement - Sharing - Version 1.0",
+    "license_id": "CDLA-Sharing-1.0",
+    "data_origin": "synthetic, as declared by the IBM publisher",
+    "origin_evidence_url": "https://github.com/IBM/AML-Data/blob/main/README.md",
+    "origin_independently_verified": false
+  },
+  "files": [
+    {
+      "filename": "HI-Small_Patterns.txt",
+      "source_url": "https://www.kaggle.com/api/v1/datasets/download/ealtman2019/ibm-transactions-for-anti-money-laundering-aml/HI-Small_Patterns.txt?datasetVersionNumber=8",
+      "dataset_version_number_requested": 8,
+      "size_bytes": 323844,
+      "sha256": "2c546b5ce6009e73851f0139af053cf845f08bf92f3bc82fe1eb937dec2ef39b",
+      "status": "verified"
+    },
+    {
+      "filename": "HI-Small_Trans.csv",
+      "source_url": "https://www.kaggle.com/api/v1/datasets/download/ealtman2019/ibm-transactions-for-anti-money-laundering-aml/HI-Small_Trans.csv?datasetVersionNumber=8",
+      "dataset_version_number_requested": 8,
+      "size_bytes": 475664283,
+      "sha256": "b19d39f515523373f991b689c07e11e7b0b95c17a2c27a87d91584ae16c5b040",
+      "status": "verified"
+    }
+  ],
+  "scope": "Source metadata and hashes only; original transactions and local profiles remain in ignored data/raw/ibm/.",
+  "labels_and_patterns_used_as_features": false
+}

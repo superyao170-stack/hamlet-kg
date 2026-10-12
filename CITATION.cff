@@ -1,8 +1,7 @@
 cff-version: 1.2.0
-message: "If you use HAMLET-KG, please cite the accompanying paper."
-title: "HAMLET-KG: LLM-Augmented Multi-Granular Event Knowledge Graphs"
+message: "If you use this research prototype, cite this software repository. No accompanying accepted paper is claimed."
+title: "HAMLET-KG: Knowledge-Guided Temporal Event Graphs for AML Detection"
 type: software
-version: 0.1.0
-date-released: 2026-09-08
+version: 0.6.0
+date-released: 2026-10-09
 license: MIT
-

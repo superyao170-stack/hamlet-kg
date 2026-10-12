@@ -4,18 +4,22 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hamletkg"
-version = "0.2.0"
-description = "Algorithm-first multi-granular event knowledge graphs for AML research"
+version = "0.6.0"
+description = "Knowledge-guided causal temporal event graphs for AML detection research"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [{name = "HAMLET-KG Research Project"}]
-keywords = ["knowledge-graph", "large-language-model", "anti-money-laundering", "temporal-graph", "case-retrieval"]
+keywords = ["knowledge-graph", "anti-money-laundering", "temporal-graph", "graph-learning", "explainability"]
 classifiers = [
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.10",
   "License :: OSI Approved :: MIT License",
 ]
+
+[project.optional-dependencies]
+detection = ["torch>=2.2,<3", "numpy>=1.26,<3"]
+benchmark = ["torch>=2.2,<3", "numpy>=1.26,<3", "lightgbm>=4.3,<5"]
 
 [project.scripts]
 hamletkg = "hamletkg.cli:main"

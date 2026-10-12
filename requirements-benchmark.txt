@@ -1,0 +1,4 @@
+# Neural and tabular fixed-split benchmark dependencies.
+torch>=2.2,<3
+numpy>=1.26,<3
+lightgbm>=4.3,<5
